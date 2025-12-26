@@ -3,6 +3,9 @@ body{font-family:system-ui,Segoe UI,Arial,sans-serif;font-size:12px;margin:12px;
 .section h2{margin:0 0 8px 0;font-size:14px}
 label{display:block;margin:6px 0}
 input,select,textarea{width:100%;box-sizing:border-box;padding:6px;border:1px solid #ccc;border-radius:6px}
+.section label.row{display:flex;align-items:center}
+input[type="checkbox"]{width:auto;height:auto;margin-right:6px;border:none;padding:0}
+.section label.row span{flex:1}
 .row{display:flex;gap:6px}
 .row label{flex:1}
 button{padding:6px 10px;border:1px solid #888;border-radius:6px;background:#fafafa;cursor:pointer}
