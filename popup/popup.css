@@ -12,3 +12,4 @@ button{padding:6px 10px;border:1px solid #888;border-radius:6px;background:#fafa
 button:hover{background:#f0f0f0}
 .status{margin-top:6px;color:#0a7}
 .error{color:#c00}
+.hidden{display:none!important}

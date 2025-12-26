@@ -34,6 +34,18 @@ function showStatus(msg, isError=false) {
   s.classList.toggle("error", !!isError);
 }
 
+async function updateAuthButtons() {
+  const btnRegister = el("btnRegister");
+  const btnLogin = el("btnLogin");
+  const btnLogout = el("btnLogout");
+  const cookiePk = await getPasswordKeyCookie();
+  const sessionPk = getPasswordKeySession();
+  const loggedIn = !!(cookiePk || sessionPk);
+  if (btnRegister) btnRegister.classList.toggle("hidden", loggedIn);
+  if (btnLogin) btnLogin.classList.toggle("hidden", loggedIn);
+  if (btnLogout) btnLogout.classList.toggle("hidden", !loggedIn);
+}
+
 async function onRegister() {
   try {
     showStatus("Registering...");
@@ -51,6 +63,7 @@ async function onRegister() {
     }
     setReservedProfile({ email, apps });
     showStatus("Registered.");
+    await updateAuthButtons();
   } catch (e) {
     showStatus(String(e.message || e), true);
   }
@@ -73,6 +86,7 @@ async function onLogin() {
     }
     setReservedProfile({ email, apps });
     showStatus("Login success.");
+    await updateAuthButtons();
   } catch (e) {
     showStatus(String(e.message || e), true);
   }
@@ -82,6 +96,7 @@ async function onLogout() {
   await removePasswordKeyCookie();
   clearPasswordKeySession();
   showStatus("Logged out.");
+  await updateAuthButtons();
 }
 
 async function onDownload() {
@@ -171,4 +186,5 @@ window.addEventListener("DOMContentLoaded", async () => {
   el("btnLogout").addEventListener("click", onLogout);
   el("btnDownload").addEventListener("click", onDownload);
   el("btnUpload").addEventListener("click", onUpload);
+  await updateAuthButtons();
 });
