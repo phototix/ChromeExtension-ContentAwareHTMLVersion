@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Content-Aware HTML Chat",
+  "version": "0.1.0",
+  "description": "Chat with OpenAI about the current page's HTML. Includes masterAuth sync for settings.",
+  "action": {
+    "default_title": "Content-Aware Chat",
+    "default_popup": "popup/popup.html"
+  },
+  "permissions": [
+    "storage",
+    "tabs",
+    "scripting",
+    "cookies",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://api.brandon.my/*",
+    "https://api.openai.com/*",
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "devtools_page": "devtools/devtools.html",
+  "minimum_chrome_version": "109"
+}

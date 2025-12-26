@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Content-Aware Chat Settings</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="section">
+    <h2>OpenAI</h2>
+    <label>API Key <input id="apiKey" type="password" placeholder="sk-..." /></label>
+    <label>Model
+      <select id="model">
+        <option value="gpt-4o-mini">gpt-4o-mini</option>
+        <option value="gpt-4o">gpt-4o</option>
+        <option value="o4-mini">o4-mini</option>
+        <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+      </select>
+    </label>
+    <label>System Prompt
+      <textarea id="systemPrompt" rows="3" placeholder="You are a helpful assistant..."></textarea>
+    </label>
+    <button id="saveOpenAI">Save</button>
+  </div>
+
+  <div class="section">
+    <h2>masterAuth</h2>
+    <div class="row">
+      <label>Email <input id="maEmail" type="email" placeholder="user@example.com" /></label>
+      <label>Password <input id="maPassword" type="password" placeholder="••••••" /></label>
+    </div>
+    <div class="row">
+      <button id="btnRegister">Register</button>
+      <button id="btnLogin">Login</button>
+      <button id="btnLogout">Logout</button>
+    </div>
+    <div class="row">
+      <button id="btnDownload">Download Config</button>
+      <button id="btnUpload">Upload Config</button>
+    </div>
+    <div id="maStatus" class="status"></div>
+  </div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
