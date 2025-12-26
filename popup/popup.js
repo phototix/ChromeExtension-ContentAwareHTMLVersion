@@ -38,12 +38,17 @@ async function updateAuthButtons() {
   const btnRegister = el("btnRegister");
   const btnLogin = el("btnLogin");
   const btnLogout = el("btnLogout");
+  const credRow = el("authCreds");
   const cookiePk = await getPasswordKeyCookie();
   const sessionPk = getPasswordKeySession();
   const loggedIn = !!(cookiePk || sessionPk);
-  if (btnRegister) btnRegister.classList.toggle("hidden", loggedIn);
-  if (btnLogin) btnLogin.classList.toggle("hidden", loggedIn);
+  const profile = getReservedProfile();
+  const hasEmail = !!profile?.email;
+  const authedWithProfile = loggedIn && hasEmail;
+  if (btnRegister) btnRegister.classList.toggle("hidden", authedWithProfile);
+  if (btnLogin) btnLogin.classList.toggle("hidden", authedWithProfile);
   if (btnLogout) btnLogout.classList.toggle("hidden", !loggedIn);
+  if (credRow) credRow.classList.toggle("hidden", authedWithProfile);
 }
 
 async function onRegister() {

@@ -1,4 +1,4 @@
-import { chatWithOpenAI } from "../common/openai.js";
+import { chatWithOpenAI, summarizeMessages } from "../common/openai.js";
 
 const chatEl = document.getElementById("chat");
 const userInput = document.getElementById("userInput");
@@ -10,6 +10,7 @@ const htmlInfo = document.getElementById("htmlInfo");
 let pageHtml = "";
 let history = [];
 let hostKey = "unknown";
+let summary = "";
 
 function escapeHtml(s) {
   return String(s)
@@ -125,6 +126,10 @@ function computeHistoryKey() {
   return `chat_history_${hostKey}`;
 }
 
+function computeSummaryKey() {
+  return `chat_summary_${hostKey}`;
+}
+
 function saveHistory() {
   localStorage.setItem(computeHistoryKey(), JSON.stringify(history));
 }
@@ -136,6 +141,57 @@ function loadHistory() {
     history = [];
   }
   history.forEach((m) => appendMsg(m.role === "user" ? "user" : "assistant", m.content));
+}
+
+function saveSummary() {
+  localStorage.setItem(computeSummaryKey(), summary || "");
+}
+
+function loadSummary() {
+  summary = localStorage.getItem(computeSummaryKey()) || "";
+}
+
+function estimateChars(arr) {
+  try {
+    return arr.reduce((n, m) => n + String(m.content || "").length, 0);
+  } catch {
+    return 0;
+  }
+}
+
+async function maybeSummarize(settings) {
+  // If the conversation grows, summarize older parts and keep only recent messages.
+  const maxRecent = 6; // keep last 6 messages as recent context
+  const charBudget = 8000; // approximate size limit
+  const needsByLength = history.length > 16;
+  const needsByChars = estimateChars(history) > charBudget;
+  if (!needsByLength && !needsByChars) return;
+
+  const cutoff = Math.max(0, history.length - maxRecent);
+  const older = history.slice(0, cutoff);
+  const recent = history.slice(cutoff);
+  if (older.length === 0) return;
+
+  try {
+    // Summarize existing summary + older into a refreshed summary
+    const base = summary ? [{ role: "system", content: `Existing summary: ${summary}` }] : [];
+    const toSummarize = base.concat(older);
+    const newSummary = await summarizeMessages({
+      apiKey: settings.apiKey,
+      model: settings.model,
+      messagesToSummarize: toSummarize,
+      maxWords: 250
+    });
+    summary = newSummary || summary; // fallback to previous if empty
+    saveSummary();
+    // Keep only recent messages in history after summarizing
+    history = recent;
+    saveHistory();
+  } catch (e) {
+    // If summarization fails, just prune oldest to keep UI responsive
+    history = history.slice(-maxRecent);
+    saveHistory();
+  }
 }
 
 function clearHistoryUI() {
@@ -175,11 +231,14 @@ async function sendMessage() {
       systemPrompt: settings.systemPrompt,
       userPrompt: prompt,
       contextText: pageHtml,
-      historyMessages: history.map((m) => ({ role: m.role, content: m.content }))
+      historyMessages: history.slice(-6).map((m) => ({ role: m.role, content: m.content })),
+      summaryText: summary
     });
     appendMsg("assistant", answer);
     history.push({ role: "assistant", content: answer });
     saveHistory();
+    // Summarize in the background if needed
+    maybeSummarize(settings);
   } catch (e) {
     const msg = e?.message || String(e);
     appendMsg("assistant", `Error: ${msg}`);
@@ -191,6 +250,7 @@ async function init() {
   chrome.devtools.inspectedWindow.eval("location.host", (res, exc) => {
     hostKey = (res || "unknown").trim() || "unknown";
     loadHistory();
+    loadSummary();
   });
 
   btnLoadHtml.addEventListener("click", async () => {
@@ -221,6 +281,8 @@ async function init() {
     history = [];
     saveHistory();
     clearHistoryUI();
+    summary = "";
+    saveSummary();
   });
 }
 
