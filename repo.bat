@@ -2,6 +2,11 @@
 echo Running git commands in current directory...
 echo.
 
+REM Set commit message from first argument or default to "Update"
+setlocal EnableExtensions
+set "COMMIT_MSG=%~1"
+if "%COMMIT_MSG%"=="" set "COMMIT_MSG=Update"
+
 REM Change to the directory where the batch file is located
 cd /d "%~dp0"
 
@@ -31,7 +36,8 @@ if %errorlevel% neq 0 (
 )
 
 echo Committing changes...
-git commit -m "update"
+echo Commit message: %COMMIT_MSG%
+git commit -m "%COMMIT_MSG%"
 if %errorlevel% neq 0 (
     echo Error: Failed to commit changes.
     pause
