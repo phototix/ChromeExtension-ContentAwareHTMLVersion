@@ -200,8 +200,20 @@ async function init() {
 
   btnSend.addEventListener("click", sendMessage);
   userInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-      sendMessage();
+    if (e.key !== "Enter") return;
+    const sendOnEnter = localStorage.getItem("chat_send_on_enter") === "true";
+    if (sendOnEnter) {
+      // Enter sends, Shift+Enter makes newline
+      if (!e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    } else {
+      // Default: Enter = newline, Ctrl/Cmd+Enter sends
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        sendMessage();
+      }
     }
   });
 

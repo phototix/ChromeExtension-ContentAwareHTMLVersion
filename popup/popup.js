@@ -7,6 +7,7 @@ function loadSaved() {
   el("apiKey").value = localStorage.getItem("oa_api_key") || "";
   el("model").value = localStorage.getItem("oa_model") || "gpt-4o-mini";
   el("systemPrompt").value = localStorage.getItem("oa_system_prompt") || "";
+  el("sendOnEnter").checked = (localStorage.getItem("chat_send_on_enter") === "true");
 
   const profile = getReservedProfile();
   if (profile) {
@@ -18,6 +19,7 @@ function saveOpenAI() {
   localStorage.setItem("oa_api_key", el("apiKey").value.trim());
   localStorage.setItem("oa_model", el("model").value);
   localStorage.setItem("oa_system_prompt", el("systemPrompt").value.trim());
+  localStorage.setItem("chat_send_on_enter", el("sendOnEnter").checked ? "true" : "false");
   showStatus("Saved OpenAI settings.");
 }
 
