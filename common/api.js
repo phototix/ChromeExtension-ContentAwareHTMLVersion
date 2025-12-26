@@ -4,7 +4,9 @@
 const MASTER_BASE = "https://api.brandon.my/v1/api";
 export const RESERVED_KEYS = [
   "masterauth_profile_v1",
-  "masterauth_last_sync_v1"
+  "masterauth_last_sync_v1",
+  // Do not sync sensitive auth/session secrets
+  "masterauth_password_key_v1"
 ];
 
 export function getAppIdFromUrl(urlString) {

@@ -57,3 +57,17 @@ export function setLastSync(ts) {
 export function getLastSync() {
   return localStorage.getItem("masterauth_last_sync_v1");
 }
+
+// Session helpers for password_key when cookies are unavailable
+export function setPasswordKeySession(passwordKey) {
+  if (!passwordKey) return;
+  localStorage.setItem("masterauth_password_key_v1", String(passwordKey));
+}
+
+export function getPasswordKeySession() {
+  return localStorage.getItem("masterauth_password_key_v1");
+}
+
+export function clearPasswordKeySession() {
+  localStorage.removeItem("masterauth_password_key_v1");
+}

@@ -1,5 +1,5 @@
 import { register, login, getAppData, updateAppData, setPasswordKeyCookie, getPasswordKeyCookie, removePasswordKeyCookie, getAppIdFromUrl } from "../common/api.js";
-import { getLocalSnapshot, replaceLocalWithSnapshot, setReservedProfile, getReservedProfile, setLastSync, getLastSync } from "../common/storage.js";
+import { getLocalSnapshot, replaceLocalWithSnapshot, setReservedProfile, getReservedProfile, setLastSync, getLastSync, setPasswordKeySession, getPasswordKeySession, clearPasswordKeySession } from "../common/storage.js";
 
 const el = (id) => document.getElementById(id);
 
@@ -21,13 +21,9 @@ function saveOpenAI() {
   showStatus("Saved OpenAI settings.");
 }
 
-// async function currentTabUrl() {
-//   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-//   return tab?.url || "";
-// }
-
 async function resolveAppId() {
-  const url = "crhome-extension-tabHTMLHelperAI";
+  // Fixed app id for this Chrome extension
+  return "chrome-extension-tabHTMLHelperAI";
 }
 
 function showStatus(msg, isError=false) {
@@ -43,7 +39,10 @@ async function onRegister() {
     const password = el("maPassword").value;
     const apps = await resolveAppId();
     const res = await register({ email, password, apps });
-    if (res?.password_key) await setPasswordKeyCookie(res.password_key);
+    if (res?.password_key) {
+      await setPasswordKeyCookie(res.password_key);
+      setPasswordKeySession(res.password_key);
+    }
     setReservedProfile({ email, apps });
     showStatus(`Registered (${res.status || "ok"}).`);
   } catch (e) {
@@ -58,10 +57,12 @@ async function onLogin() {
     const password = el("maPassword").value;
     const apps = await resolveAppId();
     const res = await login({ email, password, apps });
-    if (res?.password_key) await setPasswordKeyCookie(res.password_key);
+    if (res?.password_key) {
+      await setPasswordKeyCookie(res.password_key);
+      setPasswordKeySession(res.password_key);
+    }
     setReservedProfile({ email, apps });
-    showStatus("Login success. Syncing...");
-    await autoSync({ email, apps, password_key: res.password_key });
+    showStatus("Login success.");
   } catch (e) {
     showStatus(String(e.message || e), true);
   }
@@ -69,6 +70,7 @@ async function onLogin() {
 
 async function onLogout() {
   await removePasswordKeyCookie();
+  clearPasswordKeySession();
   showStatus("Logged out.");
 }
 
@@ -77,8 +79,12 @@ async function onDownload() {
     showStatus("Downloading...");
     const profile = getReservedProfile();
     const cookiePk = await getPasswordKeyCookie();
-    if (!profile?.email || !profile?.apps || !cookiePk) throw new Error("Not logged in");
-    const res = await getAppData({ email: profile.email, apps: profile.apps, password_key: cookiePk });
+    const sessionPk = getPasswordKeySession();
+    const password_key = cookiePk || sessionPk;
+    const apps = profile?.apps || (await resolveAppId());
+    if (!profile?.email || !apps || !password_key) throw new Error("Not logged in");
+    if (!profile?.apps && apps) setReservedProfile({ email: profile.email, apps });
+    const res = await getAppData({ email: profile.email, apps, password_key });
     if (res?.status === "data-found") {
       const d = typeof res.data === "string" ? JSON.parse(res.data) : (res.data || {});
       replaceLocalWithSnapshot(d);
@@ -97,9 +103,13 @@ async function onUpload() {
     showStatus("Uploading...");
     const profile = getReservedProfile();
     const cookiePk = await getPasswordKeyCookie();
-    if (!profile?.email || !profile?.apps || !cookiePk) throw new Error("Not logged in");
+    const sessionPk = getPasswordKeySession();
+    const password_key = cookiePk || sessionPk;
+    const apps = profile?.apps || (await resolveAppId());
+    if (!profile?.email || !apps || !password_key) throw new Error("Not logged in");
     const payload = getLocalSnapshot();
-    const res = await updateAppData({ email: profile.email, apps: profile.apps, password_key: cookiePk, app_data: payload });
+    if (!profile?.apps && apps) setReservedProfile({ email: profile.email, apps });
+    const res = await updateAppData({ email: profile.email, apps, password_key, app_data: payload });
     if (res?.status === "data-updated") {
       const now = new Date().toISOString();
       setLastSync(now);
