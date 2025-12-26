@@ -39,12 +39,16 @@ async function onRegister() {
     const password = el("maPassword").value;
     const apps = await resolveAppId();
     const res = await register({ email, password, apps });
+    if (res?.status !== "success-registered") {
+      showStatus(res?.status || "Registration failed", true);
+      return;
+    }
     if (res?.password_key) {
       await setPasswordKeyCookie(res.password_key);
       setPasswordKeySession(res.password_key);
     }
     setReservedProfile({ email, apps });
-    showStatus(`Registered (${res.status || "ok"}).`);
+    showStatus("Registered.");
   } catch (e) {
     showStatus(String(e.message || e), true);
   }
@@ -57,6 +61,10 @@ async function onLogin() {
     const password = el("maPassword").value;
     const apps = await resolveAppId();
     const res = await login({ email, password, apps });
+    if (res?.status !== "success-login" || !res?.password_key) {
+      showStatus(res?.status || "Login failed", true);
+      return;
+    }
     if (res?.password_key) {
       await setPasswordKeyCookie(res.password_key);
       setPasswordKeySession(res.password_key);
