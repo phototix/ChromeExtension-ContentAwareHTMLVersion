@@ -110,8 +110,60 @@ function appendMsg(role, text) {
   } else {
     div.textContent = text;
   }
+  // Add copy button
+  const copyBtn = makeCopyButton(text);
+  div.appendChild(copyBtn);
   chatEl.appendChild(div);
   chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+async function copyToClipboard(str){
+  try{
+    if (navigator.clipboard && window.isSecureContext !== false) {
+      await navigator.clipboard.writeText(str);
+      return true;
+    }
+  }catch{}
+  // Fallback
+  try{
+    const ta = document.createElement("textarea");
+    ta.value = str;
+    ta.style.position = "fixed";
+    ta.style.left = "-9999px";
+    ta.style.top = "0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    return ok;
+  }catch{
+    return false;
+  }
+}
+
+function makeCopyButton(text){
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "copy-btn";
+  btn.title = "Copy";
+  btn.setAttribute("aria-label","Copy message");
+  btn.innerHTML = `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M16 1H4c-1.1 0-2 .9-2 2v12h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+    </svg>`;
+  btn.addEventListener("click", async (e)=>{
+    e.stopPropagation();
+    const ok = await copyToClipboard(text || "");
+    const prevTitle = btn.title;
+    btn.classList.toggle("copied", !!ok);
+    btn.title = ok ? "Copied" : "Copy failed";
+    setTimeout(()=>{
+      btn.classList.remove("copied");
+      btn.title = prevTitle;
+    }, 1200);
+  });
+  return btn;
 }
 
 function loadSettings() {
