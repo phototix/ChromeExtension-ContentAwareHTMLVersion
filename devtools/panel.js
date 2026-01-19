@@ -273,8 +273,6 @@ async function sendMessage() {
   userInput.value = "";
 
   appendMsg("user", prompt);
-  history.push({ role: "user", content: prompt });
-  saveHistory();
 
   try {
     const answer = await chatWithOpenAI({
@@ -287,6 +285,8 @@ async function sendMessage() {
       summaryText: summary
     });
     appendMsg("assistant", answer);
+    // Only add to history after successful API call
+    history.push({ role: "user", content: prompt });
     history.push({ role: "assistant", content: answer });
     saveHistory();
     // Summarize in the background if needed
