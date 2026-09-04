@@ -3,9 +3,16 @@ import { getLocalSnapshot, replaceLocalWithSnapshot, setReservedProfile, getRese
 
 const el = (id) => document.getElementById(id);
 
+function getProviderDefaultModel(provider = "openai") {
+  return provider === "deepseek" ? "deepseek-chat" : "gpt-4o-mini";
+}
+
 function loadSaved() {
+  const provider = localStorage.getItem("oa_provider") || "openai";
+  const modelDefault = getProviderDefaultModel(provider);
+  el("provider").value = provider;
   el("apiKey").value = localStorage.getItem("oa_api_key") || "";
-  el("model").value = localStorage.getItem("oa_model") || "gpt-4o-mini";
+  el("model").value = localStorage.getItem("oa_model") || modelDefault;
   el("systemPrompt").value = localStorage.getItem("oa_system_prompt") || "";
   el("sendOnEnter").checked = (localStorage.getItem("chat_send_on_enter") === "true");
 
@@ -16,11 +23,13 @@ function loadSaved() {
 }
 
 function saveOpenAI() {
+  const provider = el("provider").value || "openai";
+  localStorage.setItem("oa_provider", provider);
   localStorage.setItem("oa_api_key", el("apiKey").value.trim());
-  localStorage.setItem("oa_model", el("model").value);
+  localStorage.setItem("oa_model", el("model").value || getProviderDefaultModel(provider));
   localStorage.setItem("oa_system_prompt", el("systemPrompt").value.trim());
   localStorage.setItem("chat_send_on_enter", el("sendOnEnter").checked ? "true" : "false");
-  showStatus("Saved OpenAI settings.");
+  showStatus(`Saved ${provider === "deepseek" ? "DeepSeek" : "OpenAI"} settings.`);
 }
 
 async function resolveAppId() {

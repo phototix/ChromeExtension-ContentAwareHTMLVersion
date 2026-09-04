@@ -1,5 +1,24 @@
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Arial,sans-serif;font-size:12px;color:#111;display:flex;flex-direction:column;height:100vh}
 header{display:flex;align-items:center;gap:8px;padding:8px;border-bottom:1px solid #e0e0e0}
+.toggle-wrap{display:inline-flex;align-items:center;gap:6px;user-select:none;color:#333}
+.toggle-wrap input{margin:0}
+.status-pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;border:1px solid #d1d5db;background:#f3f4f6;color:#4b5563}
+.status-pill.on{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
+.status-pill.off{background:#f9fafb;color:#6b7280;border-color:#e5e7eb}
+#changesPanel{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px;border-bottom:1px solid #e5e7eb;background:#fcfcfd;max-height:170px;overflow:hidden}
+.changes-col{min-width:0;display:flex;flex-direction:column;gap:4px}
+.changes-col h3{margin:0;font-size:11px;color:#4b5563;text-transform:uppercase;letter-spacing:.03em}
+.changes-list{margin:0;padding:0;list-style:none;overflow:auto;border:1px solid #eef0f3;border-radius:8px;background:#fff;min-height:36px;max-height:110px}
+.changes-list li{padding:5px 7px;border-bottom:1px solid #f2f3f5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;color:#374151}
+.changes-list li:last-child{border-bottom:none}
+.changes-list li.placeholder{font-style:italic;color:#9ca3af;font-family:inherit}
+#systemPromptPanel{display:flex;flex-direction:column;gap:6px;padding:8px;border-bottom:1px solid #e5e7eb;background:#fff}
+#systemPromptPanel label{font-size:11px;color:#4b5563;font-weight:600}
+#cannedPromptSelect{width:100%;padding:6px 8px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-size:12px}
+.system-prompt-row{display:flex;gap:8px;align-items:stretch}
+#initialSystemPrompt{flex:1;min-height:56px;resize:vertical;padding:8px;border:1px solid #d1d5db;border-radius:8px;font-size:12px;line-height:1.3}
+.system-prompt-actions{display:flex;flex-direction:column;gap:6px}
+.system-prompt-actions button{min-width:64px}
 main#chat{flex:1;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:10px;background:#f9fafb}
 .msg{position:relative;padding:8px 10px;border-radius:8px;max-width:70%}
 .msg.user{align-self:flex-end;background:#e6f0ff}

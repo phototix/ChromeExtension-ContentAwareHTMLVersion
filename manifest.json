@@ -17,6 +17,7 @@
   "host_permissions": [
     "https://api.brandon.my/*",
     "https://api.openai.com/*",
+    "https://api.deepseek.com/*",
     "<all_urls>"
   ],
   "background": {

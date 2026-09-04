@@ -9,8 +9,41 @@
   <header>
     <button id="btnLoadHtml">Load Page HTML</button>
     <span id="htmlInfo"></span>
+    <label class="toggle-wrap" for="liveListenToggle">
+      <input type="checkbox" id="liveListenToggle" />
+      Live listen
+    </label>
+    <span id="liveStatus" class="status-pill off">Live: OFF</span>
     <button id="btnClearHistory">Clear History</button>
   </header>
+
+  <section id="changesPanel" aria-live="polite">
+    <div class="changes-col">
+      <h3>DOM changes</h3>
+      <ul id="domChanges" class="changes-list"></ul>
+    </div>
+    <div class="changes-col">
+      <h3>Console changes</h3>
+      <ul id="consoleChanges" class="changes-list"></ul>
+    </div>
+  </section>
+
+  <section id="systemPromptPanel" aria-label="Initial system prompt">
+    <label for="initialSystemPrompt">Initial system prompt (sent first on every request)</label>
+    <select id="cannedPromptSelect" aria-label="Choose a canned system prompt">
+      <option value="">Choose a canned prompt...</option>
+      <option value="ai-coach">AI Coach</option>
+      <option value="do-quiz">Do Quiz</option>
+      <option value="contents-aware">Contents Aware</option>
+    </select>
+    <div class="system-prompt-row">
+      <textarea id="initialSystemPrompt" rows="2" placeholder="Set an initial system instruction for this DevTools chat..."></textarea>
+      <div class="system-prompt-actions">
+        <button id="btnSaveSystemPrompt" type="button">Save</button>
+        <button id="btnClearSystemPrompt" type="button">Clear</button>
+      </div>
+    </div>
+  </section>
 
   <main id="chat"></main>
 
